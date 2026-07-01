@@ -22,7 +22,16 @@ on the real **GEN-027 — Handling of Manufacturing Reworks** DDR sample.
   the full pipeline assembled. Contrast with `TrackWiseConverter`, which populates the
   approved template for production fidelity.
 
-Suggested path: run `ScratchDocumentWriter` → open the result in Word → rename it to `.zip`
+- **[`OPENXML_CHEATSHEET.md`](OPENXML_CHEATSHEET.md)** — a one-page printable reference of the
+  most-used snippets.
+
+Instant demo (no client files needed):
+```bash
+dotnet run --project src/Twf.Console -- --scratch demo.docx
+```
+This builds a full TrackWise SOP from scratch so the team gets an open-in-Word artifact while learning.
+
+Suggested path: run the `--scratch` demo → open the result in Word → rename it to `.zip`
 and read `word/document.xml` → then read the cookbook top to bottom.
 
 ## What it does
