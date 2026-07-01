@@ -12,25 +12,7 @@ namespace Twf.DocEngine;
 /// </summary>
 public sealed class DocxParser
 {
-    // Legacy heading -> target section. Handles DDR singular/plural and relocations.
-    private static readonly Dictionary<string, TargetSection> Aliases = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["PURPOSE"] = TargetSection.Purpose,
-        ["SCOPE"] = TargetSection.Scope,
-        ["RESPONSIBILITY"] = TargetSection.Responsibilities,
-        ["RESPONSIBILITIES"] = TargetSection.Responsibilities,
-        ["REFERENCE"] = TargetSection.References,
-        ["REFERENCES"] = TargetSection.References,
-        ["DEFINITION"] = TargetSection.Definitions,
-        ["DEFINITIONS"] = TargetSection.Definitions,
-        ["PROCEDURE"] = TargetSection.Procedure,
-        ["ATTACHMENT"] = TargetSection.Forms,
-        ["ATTACHMENTS"] = TargetSection.Forms,
-        ["FORM"] = TargetSection.Forms,
-        ["FORMS"] = TargetSection.Forms,
-        ["RECORD OF REVISIONS"] = TargetSection.RevisionHistory,
-        ["REVISION HISTORY"] = TargetSection.RevisionHistory,
-    };
+    // Heading recognition is shared with TemplateFiller via SectionHeadings.
 
     public SopDocument Parse(string sourcePath, DocType docType = DocType.Ddr)
     {
@@ -77,7 +59,7 @@ public sealed class DocxParser
             if (text.Length == 0) continue;
 
             // A short line that matches a known heading switches the current section.
-            if (text.Length < 40 && TryMatchHeading(text, out var tgt))
+            if (text.Length < 40 && SectionHeadings.TryMatch(text, out var tgt))
             {
                 // Revision History content comes from the table, not body paragraphs.
                 current = tgt == TargetSection.RevisionHistory ? null : tgt;
@@ -105,14 +87,6 @@ public sealed class DocxParser
                     Reason = cells[2]
                 });
         }
-    }
-
-    private static bool TryMatchHeading(string text, out TargetSection target)
-    {
-        var key = text.Trim().ToUpperInvariant().TrimEnd(':').Trim();
-        key = Regex.Replace(key, @"\(CONTINUED\)", "", RegexOptions.IgnoreCase).Trim();
-        key = Regex.Replace(key, @"\s+", " ");
-        return Aliases.TryGetValue(key, out target);
     }
 
     private static string AfterColon(string line)

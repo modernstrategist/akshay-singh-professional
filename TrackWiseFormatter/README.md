@@ -53,6 +53,12 @@ output document that:
 5. Produces an **Exception Report** for anything deferred or unresolved.
 6. **Never modifies the source** — it builds against a copy of the template.
 
+**Key design:** the converter treats the **approved output template as the format source of
+truth**. `TemplateFiller` opens the template and inserts the mapped content *under the
+template's own headings*, and fills the template's *own* revision table — it does not rebuild
+the body from the input. This guarantees the output matches the requested format (headings
+stay exactly as the template defines them; the revision table keeps its valid structure).
+
 ## Project structure
 
 | Project | Responsibility |

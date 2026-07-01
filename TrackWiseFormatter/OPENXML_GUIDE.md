@@ -117,8 +117,13 @@ as plain bold text; real list numbering is here for when you tackle `I.A.1 → 1
 
 | Approach | Class | Use when |
 |---|---|---|
-| **Populate the approved template** | `TrackWiseConverter` | Production — inherits the template's exact styles, logo, confidentiality header |
+| **Fill the approved template in place** | `TrackWiseConverter` → `TemplateFiller` | Production — keeps the template's own headings, FORMS layout, and valid revision table; only inserts mapped text under each heading |
 | **Build from scratch** | `Learning/ScratchDocumentWriter` | Learning + full control; no template file needed |
+
+**Why "fill in place" and not "rebuild the body":** the output template *is* the requested
+format. `TemplateFiller` locates each existing heading and inserts content beneath it, and
+fills the template's own revision table. It never re-creates headings or tables — so you
+can't accidentally re-number headings or emit a table without a `tblGrid`.
 
 Both consume the same `SopDocument` model from `DocxParser`. Study `ScratchDocumentWriter`
 to see the whole pipeline assembled with the cookbook; ship `TrackWiseConverter` for fidelity.

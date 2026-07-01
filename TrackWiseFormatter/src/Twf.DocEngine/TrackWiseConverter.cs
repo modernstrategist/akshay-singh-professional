@@ -13,8 +13,7 @@ public sealed class TrackWiseConverter
 {
     private readonly DocxParser _parser = new();
     private readonly HeaderBuilder _header = new();
-    private readonly SectionBuilder _sections = new();
-    private readonly RevisionHistoryBuilder _revisions = new();
+    private readonly TemplateFiller _filler = new();
     private readonly LegacyIdMap _legacy;
     private readonly ConversionOptions _options;
 
@@ -36,8 +35,7 @@ public sealed class TrackWiseConverter
         {
             var body = doc.MainDocumentPart!.Document.Body!;
             _header.Apply(doc, model, _options);
-            _sections.Apply(body, model);          // sections 1-7
-            _revisions.Apply(body, model, _options); // section 8
+            _filler.Fill(body, model, _options);   // insert content under the template's own headings + table
             doc.MainDocumentPart.Document.Save();
         }
 
