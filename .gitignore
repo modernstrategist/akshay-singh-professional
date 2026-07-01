@@ -1,0 +1,3 @@
+# Delivery artifacts (shared out-of-band, not version-controlled)
+TrackWiseFormatter_*.zip
+*.zip
