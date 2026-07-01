@@ -9,6 +9,22 @@ on the real **GEN-027 — Handling of Manufacturing Reworks** DDR sample.
 > generates document body text. AI (Azure AI Foundry / OpenAI) is reserved for the
 > fuzzy section-mapping assist added in Phase 3.
 
+## Learning OpenXML (start here if the SDK is new to the team)
+
+- **[`OPENXML_GUIDE.md`](OPENXML_GUIDE.md)** — a focused primer: the package/part/relationship
+  mental model, the content tree, the five ordering rules that cause "unreadable content",
+  and step-by-step for headers/tables/images/numbering.
+- **[`src/Twf.DocEngine/Learning/OpenXmlCookbook.cs`](src/Twf.DocEngine/Learning/OpenXmlCookbook.cs)**
+  — one small, heavily-commented method per technique (create doc, styled paragraph, bordered
+  table, **header on every page**, section properties, inline image, list numbering).
+- **[`src/Twf.DocEngine/Learning/ScratchDocumentWriter.cs`](src/Twf.DocEngine/Learning/ScratchDocumentWriter.cs)**
+  — builds the whole TrackWise document **from scratch** (no template needed) so you can see
+  the full pipeline assembled. Contrast with `TrackWiseConverter`, which populates the
+  approved template for production fidelity.
+
+Suggested path: run `ScratchDocumentWriter` → open the result in Word → rename it to `.zip`
+and read `word/document.xml` → then read the cookbook top to bottom.
+
 ## What it does
 
 Given a legacy SOP + the approved `NEW TWD SOP template.docx`, it produces a **draft**
