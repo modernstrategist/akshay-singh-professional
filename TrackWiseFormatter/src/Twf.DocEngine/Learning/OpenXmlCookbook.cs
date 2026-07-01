@@ -71,6 +71,9 @@ public static class OpenXmlCookbook
     // ---------------------------------------------------------------------
     public static Table BorderedTable(IEnumerable<string[]> rows, bool firstRowBold = true)
     {
+        var rowList = rows as IList<string[]> ?? rows.ToList();
+        int columns = rowList.Count > 0 ? rowList[0].Length : 1;
+
         var table = new Table(new TableProperties(
             new TableBorders(
                 new TopBorder { Val = BorderValues.Single, Size = 4U },
@@ -81,8 +84,13 @@ public static class OpenXmlCookbook
                 new InsideVerticalBorder { Val = BorderValues.Single, Size = 4U }),
             new TableWidth { Type = TableWidthUnitValues.Pct, Width = "5000" })); // 5000 = 100%
 
+        // REQUIRED: a <w:tblGrid> declaring the columns, or Word treats the doc as corrupt.
+        var grid = new TableGrid();
+        for (int i = 0; i < columns; i++) grid.Append(new GridColumn());
+        table.Append(grid);
+
         bool isFirst = true;
-        foreach (var row in rows)
+        foreach (var row in rowList)
         {
             var tr = new TableRow();
             foreach (var cellText in row)

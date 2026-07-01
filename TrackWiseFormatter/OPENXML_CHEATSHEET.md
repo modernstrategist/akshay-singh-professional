@@ -27,7 +27,7 @@ var sectPr = body.Elements<SectionProperties>().LastOrDefault();
 if (sectPr != null) body.InsertBefore(p, sectPr); else body.Append(p);
 ```
 
-### Bordered table (cell MUST contain a paragraph)
+### Bordered table (needs a tblGrid; cell MUST contain a paragraph)
 ```csharp
 var t = new Table(new TableProperties(
     new TableBorders(
@@ -35,6 +35,7 @@ var t = new Table(new TableProperties(
         new LeftBorder{Val=BorderValues.Single,Size=4U}, new RightBorder{Val=BorderValues.Single,Size=4U},
         new InsideHorizontalBorder{Val=BorderValues.Single,Size=4U}, new InsideVerticalBorder{Val=BorderValues.Single,Size=4U}),
     new TableWidth{Type=TableWidthUnitValues.Pct, Width="5000"}));      // 5000 = 100%
+t.Append(new TableGrid(new GridColumn(), new GridColumn(), new GridColumn())); // REQUIRED: one per column
 t.Append(new TableRow(new TableCell(new Paragraph(new Run(new Text("cell"))))));
 ```
 
@@ -64,10 +65,11 @@ foreach (var tbl in body.Elements<Table>())
     Console.WriteLine(string.Join(" | ", row.Elements<TableCell>().Select(c => c.InnerText)));
 ```
 
-### The 5 rules that prevent "unreadable content"
+### The 6 rules that prevent "unreadable content"
 1. `RunProperties` first inside `Run`. 2. `ParagraphProperties` first inside `Paragraph`.
 3. body `SectionProperties` is **last**. 4. `HeaderReference` first inside `sectPr`.
-5. Every cell has a paragraph; a table is followed by a paragraph.
+5. A `Table` has a `TableGrid` (one `GridColumn` per column) right after `TableProperties`.
+6. Every cell has a paragraph; a table is followed by a paragraph.
 
 ### Debug tip
 Rename any `.docx` to `.zip`, open `word/document.xml` — the XML you see maps 1:1 to the element tree you build in code.

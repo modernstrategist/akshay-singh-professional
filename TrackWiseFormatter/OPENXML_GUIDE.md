@@ -58,6 +58,7 @@ Almost every corruption bug is one of these:
 | `ParagraphProperties` is the **first** child of a `Paragraph` | schema order |
 | Body-level `SectionProperties` (`sectPr`) is the **last** child of the body | it describes the section that ends there |
 | `HeaderReference` comes **before** page size/margins inside `sectPr` | schema order |
+| A `Table` declares its columns in a **`TableGrid`** right after `TableProperties` | a table with no `tblGrid` is invalid — Word repairs it |
 | Every `TableCell` contains **at least one** `Paragraph`; a table is followed by a paragraph | Word requires it |
 
 `OpenXmlCookbook` encodes all five so you don't have to memorise them — but now you know why

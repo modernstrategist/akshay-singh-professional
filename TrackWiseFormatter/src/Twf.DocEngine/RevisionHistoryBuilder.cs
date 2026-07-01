@@ -24,7 +24,9 @@ public sealed class RevisionHistoryBuilder
             .ToList();
         var newRev = HeaderBuilder.FormatRevision(model.NewRevisionNumber, options.RevisionPadding);
 
-        var table = new Table(BuildTableProperties());
+        // A table MUST declare its columns in a <w:tblGrid> right after the properties,
+        // or Word reports "unreadable content" and repairs the document. 3 columns here.
+        var table = new Table(BuildTableProperties(), BuildGrid(1440, 1440, 6480));
         table.Append(Row(bold: true, "Revision Number:", "Effective Date:", "Reason for Revision:"));
         foreach (var e in prior)
             table.Append(Row(false, e.RevisionNumber, e.EffectiveDate, e.Reason));
@@ -42,6 +44,15 @@ public sealed class RevisionHistoryBuilder
             new InsideHorizontalBorder { Val = BorderValues.Single, Size = 4U },
             new InsideVerticalBorder { Val = BorderValues.Single, Size = 4U }),
         new TableWidth { Type = TableWidthUnitValues.Pct, Width = "5000" });
+
+    /// <summary>Column definitions (widths in twips). Required — a table with no tblGrid is invalid.</summary>
+    private static TableGrid BuildGrid(params int[] widthsTwips)
+    {
+        var grid = new TableGrid();
+        foreach (var w in widthsTwips)
+            grid.Append(new GridColumn { Width = w.ToString() });
+        return grid;
+    }
 
     private static TableRow Row(bool bold, params string[] cells)
     {
