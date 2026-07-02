@@ -52,6 +52,11 @@ output document that:
    *"Updated to TrackWise format."*
 5. Produces an **Exception Report** for anything deferred or unresolved.
 6. **Never modifies the source** — it builds against a copy of the template.
+7. **Review-value features** (toggle via `ConversionOptions`):
+   - **Inline review comments** — each exception becomes a Word comment anchored where it occurs (`ReviewAnnotator`).
+   - **Yellow highlighting** — N/A and unresolved fields are highlighted (SOW §4.2).
+   - **Reference rewrite** — legacy document numbers in the body become Full Number with the legacy in parentheses (`ReferenceRewriter`).
+   - **Validation gate** — every output is schema-validated (`OpenXmlValidator`); structural defects surface as exceptions before the file reaches Word.
 
 **Key design:** the converter treats the **approved output template as the format source of
 truth**. `TemplateFiller` opens the template and inserts the mapped content *under the

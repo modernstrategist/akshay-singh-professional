@@ -1,4 +1,5 @@
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Twf.Core;
 using static Twf.DocEngine.OpenXmlHelpers;
@@ -17,13 +18,16 @@ namespace Twf.DocEngine;
 /// </summary>
 public sealed class TemplateFiller
 {
-    public void Fill(Body body, SopDocument model, ConversionOptions options)
+    public void Fill(WordprocessingDocument doc, SopDocument model, ConversionOptions options,
+        ReviewAnnotator? annotator, System.DateTime stampUtc)
     {
-        FillSections(body, model);
+        var body = doc.MainDocumentPart!.Document.Body!;
+        FillSections(doc, body, model, options, annotator, stampUtc);
         FillRevisionTable(body, model, options);
     }
 
-    private static void FillSections(Body body, SopDocument model)
+    private static void FillSections(WordprocessingDocument doc, Body body, SopDocument model,
+        ConversionOptions options, ReviewAnnotator? annotator, System.DateTime stampUtc)
     {
         // Snapshot of block-level elements in document order.
         var blocks = body.ChildElements.Where(e => e is Paragraph or Table).ToList();
@@ -60,7 +64,10 @@ public sealed class TemplateFiller
             var section = model.Sections.TryGetValue(target, out var s) ? s : null;
             if (section is null || section.IsEmpty)
             {
-                anchor = body.InsertAfter(Para("N/A"), anchor);
+                var na = Para("N/A", highlightYellow: options.EnableHighlighting);
+                body.InsertAfter(na, anchor);
+                annotator?.AddComment(doc, na,
+                    $"{target}: section not present in source; set to N/A for review.", stampUtc);
             }
             else
             {

@@ -29,19 +29,54 @@ public sealed class TrackWiseConverter
         var model = _parser.Parse(sourcePath, docType);
         ResolveIdentity(model);
 
+        // A single timestamp for all review comments in this run (caller-independent).
+        var stamp = System.DateTime.UtcNow;
+
         // Build against a copy of the approved template (authentic styles + confidentiality header).
         File.Copy(templatePath, outputPath, overwrite: true);
         using (var doc = WordprocessingDocument.Open(outputPath, isEditable: true))
         {
             var body = doc.MainDocumentPart!.Document.Body!;
+            var annotator = _options.EnableReviewComments ? new ReviewAnnotator(_options.ReviewAuthor) : null;
+
             _header.Apply(doc, model, _options);
-            _filler.Fill(body, model, _options);   // insert content under the template's own headings + table
+            _filler.Fill(doc, model, _options, annotator, stamp);   // content under template headings + table
+
+            if (_options.EnableReferenceRewrite)
+                new ReferenceRewriter(_legacy).Rewrite(body, model);
+
+            AddAdvisoryExceptions(model);
+            AnnotateAdvisories(doc, body, model, annotator, stamp);
+
             doc.MainDocumentPart.Document.Save();
         }
 
-        AddAdvisoryExceptions(model);
+        if (_options.ValidateOutput)
+            foreach (var err in DocumentValidator.Validate(outputPath))
+                model.Exceptions.Add(new ExceptionRecord(Severity.Error, "SchemaValidation", err));
+
         return new ConversionResult { OutputPath = outputPath, Document = model };
     }
+
+    // Attach the Procedure-level advisories (images, numbering) as in-context comments.
+    private static void AnnotateAdvisories(WordprocessingDocument doc, DocumentFormat.OpenXml.Wordprocessing.Body body,
+        SopDocument model, ReviewAnnotator? annotator, System.DateTime stamp)
+    {
+        if (annotator is null) return;
+        var procedure = FindHeading(body, TargetSection.Procedure);
+        if (procedure is null) return;
+
+        foreach (var ex in model.Exceptions.Where(e => e.Section == "Procedure"))
+            annotator.AddComment(doc, procedure, $"[{ex.Type}] {ex.Message}", stamp);
+    }
+
+    private static DocumentFormat.OpenXml.Wordprocessing.Paragraph? FindHeading(
+        DocumentFormat.OpenXml.Wordprocessing.Body body, TargetSection ts) =>
+        body.Elements<DocumentFormat.OpenXml.Wordprocessing.Paragraph>().FirstOrDefault(p =>
+        {
+            var t = p.InnerText.Trim();
+            return t.Length is > 0 and < 60 && SectionHeadings.TryMatch(t, out var m) && m == ts;
+        });
 
     private void ResolveIdentity(SopDocument model)
     {

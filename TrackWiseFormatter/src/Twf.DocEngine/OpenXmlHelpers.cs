@@ -7,10 +7,13 @@ namespace Twf.DocEngine;
 internal static class OpenXmlHelpers
 {
     /// <summary>Create a body paragraph carrying a single run of text.</summary>
-    public static Paragraph Para(string text, bool bold = false)
+    public static Paragraph Para(string text, bool bold = false, bool highlightYellow = false)
     {
         var run = new Run();
-        if (bold) run.Append(new RunProperties(new Bold()));
+        var rpr = new RunProperties();
+        if (bold) rpr.Append(new Bold());
+        if (highlightYellow) rpr.Append(new Highlight { Val = HighlightColorValues.Yellow });
+        if (rpr.HasChildren) run.Append(rpr);
         run.Append(new Text(text) { Space = SpaceProcessingModeValues.Preserve });
         return new Paragraph(run);
     }

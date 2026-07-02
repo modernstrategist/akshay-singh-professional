@@ -57,6 +57,31 @@ var relId = main.GetIdOfPart(img);
 // then wrap relId in Drawing>Inline>Graphic>Picture (see OpenXmlCookbook.AddInlineImage)
 ```
 
+### Yellow-highlight a run
+```csharp
+var run = new Run(new RunProperties(new Highlight { Val = HighlightColorValues.Yellow }), new Text("N/A"));
+```
+
+### Comment in the margin (part + anchor)
+```csharp
+var part = main.GetPartsOfType<WordprocessingCommentsPart>().FirstOrDefault()
+           ?? main.AddNewPart<WordprocessingCommentsPart>();
+part.Comments ??= new Comments();
+part.Comments.Append(new Comment(new Paragraph(new Run(new Text("needs review"))))
+    { Id = "1", Author = "TWF", Initials = "TWF", Date = DateTime.UtcNow });
+var pPr = target.GetFirstChild<ParagraphProperties>();
+target.InsertAfter(new CommentRangeStart { Id = "1" }, pPr);   // after pPr
+target.Append(new CommentRangeEnd { Id = "1" });
+target.Append(new Run(new CommentReference { Id = "1" }));
+```
+
+### Validate a document against the schema (catches the tblGrid-type bugs)
+```csharp
+using DocumentFormat.OpenXml.Validation;
+var v = new OpenXmlValidator(FileFormatVersions.Office2019);
+foreach (var e in v.Validate(doc)) Console.WriteLine(e.Description + " @ " + e.Path?.XPath);
+```
+
 ### Read text from an existing doc
 ```csharp
 foreach (var p in body.Elements<Paragraph>()) Console.WriteLine(p.InnerText);

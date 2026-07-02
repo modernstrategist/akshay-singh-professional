@@ -24,4 +24,21 @@ public sealed class ConversionOptions
 
     /// <summary>How many prior revision rows to retain (the rule is a 4-line rolling table = 3 prior + 1 new).</summary>
     public int PriorRevisionsToKeep { get; set; } = 3;
+
+    // ---- Review-value features (SOW §4.2: make uncertain conditions visible) ----
+
+    /// <summary>Add Word comments in the margin for each exception (in-context Exception Report).</summary>
+    public bool EnableReviewComments { get; set; } = true;
+
+    /// <summary>Yellow-highlight N/A and unresolved fields.</summary>
+    public bool EnableHighlighting { get; set; } = true;
+
+    /// <summary>Rewrite legacy document numbers in the body to Full Number, legacy in parentheses.</summary>
+    public bool EnableReferenceRewrite { get; set; } = true;
+
+    /// <summary>Schema-validate the output before returning; validation errors surface as exceptions.</summary>
+    public bool ValidateOutput { get; set; } = true;
+
+    /// <summary>Author name shown on review comments.</summary>
+    public string ReviewAuthor { get; set; } = "TrackWise Formatter";
 }

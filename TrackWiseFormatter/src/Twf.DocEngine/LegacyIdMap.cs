@@ -19,6 +19,9 @@ public sealed class LegacyIdMap
         return this;
     }
 
+    /// <summary>All legacy IDs known to the map (used by the reference rewriter).</summary>
+    public IEnumerable<string> KnownIds => _map.Keys;
+
     /// <summary>Load from a CSV with header row: LegacyId,FullDocumentNumber,Title</summary>
     public static LegacyIdMap FromCsv(string path)
     {
