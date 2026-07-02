@@ -1,0 +1,6 @@
+bin/
+obj/
+out/
+*.user
+# Confidential client documents — delivered out-of-band, never committed
+samples/*.docx

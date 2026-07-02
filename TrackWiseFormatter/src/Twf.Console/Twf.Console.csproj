@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>twf</AssemblyName>
+    <RootNamespace>Twf.Console</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Twf.Core\Twf.Core.csproj" />
+    <ProjectReference Include="..\Twf.DocEngine\Twf.DocEngine.csproj" />
+  </ItemGroup>
+
+</Project>
